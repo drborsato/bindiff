@@ -1,28 +1,39 @@
 package br.com.drborsato.bindiff.service;
 
+import br.com.drborsato.bindiff.repository.BinFileRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 class BinDiffServiceImplTest {
 
-    @Test
-    void getDiffEqual() throws Exception {
+    @InjectMocks
+    private BinDiffServiceImpl service;
+
+    @Mock
+    private BinFileRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void getDiffDifferentSize() throws Exception {
+    void getDiffEqual() {
     }
 
     @Test
-    void getDiff() throws Exception {
+    void getDiffDifferentSize() {
     }
 
     @Test
-    void getDiffFileNotFound() throws Exception {
+    void getDiff() {
     }
 
     @Test
-    void getDiffException() throws Exception {
+    void getDiffFileNotFound() {
     }
+
 }
