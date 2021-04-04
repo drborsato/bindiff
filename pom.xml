@@ -68,6 +68,12 @@
 					<execution>
 						<id>default-report</id>
 						<phase>prepare-package</phase>
+						<configuration>
+							<excludes>
+								<exclude>br.com.drborsato.bindiff.model**</exclude>
+								<exclude>br.com.drborsato.bindiff.exception**</exclude>
+							</excludes>
+						</configuration>
 						<goals>
 							<goal>report</goal>
 						</goals>
