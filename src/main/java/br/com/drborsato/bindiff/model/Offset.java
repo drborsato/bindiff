@@ -1,14 +1,15 @@
 package br.com.drborsato.bindiff.model;
 
 public class Offset {
-    private int position;
-    private Side side;
-    private byte value;
 
-    public Offset(int position, Side side, byte value) {
+    private int position;
+    private byte left;
+    private byte right;
+
+    public Offset(int position, byte left, byte right) {
         this.position = position;
-        this.side = side;
-        this.value = value;
+        this.left = left;
+        this.right = right;
     }
 
     public int getPosition() {
@@ -19,19 +20,19 @@ public class Offset {
         this.position = position;
     }
 
-    public Side getSide() {
-        return side;
+    public byte getLeft() {
+        return left;
     }
 
-    public void setSide(Side side) {
-        this.side = side;
+    public void setLeft(byte left) {
+        this.left = left;
     }
 
-    public byte getValue() {
-        return value;
+    public byte getRight() {
+        return right;
     }
 
-    public void setValue(byte value) {
-        this.value = value;
+    public void setRight(byte right) {
+        this.right = right;
     }
 }

@@ -1,11 +1,12 @@
 package br.com.drborsato.bindiff.service;
 
+import br.com.drborsato.bindiff.exception.BinDataConverterException;
 import br.com.drborsato.bindiff.exception.BinFileNotFoundException;
+import br.com.drborsato.bindiff.exception.DiffFileNotFoundException;
 import br.com.drborsato.bindiff.model.BinFile;
 import br.com.drborsato.bindiff.model.Diff;
 import br.com.drborsato.bindiff.model.FileId;
 import br.com.drborsato.bindiff.model.Side;
-import br.com.drborsato.bindiff.repository.BinFileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class BinDiffServiceImplTest {
@@ -29,7 +29,7 @@ class BinDiffServiceImplTest {
     private BinDiffServiceImpl service;
 
     @Mock
-    private BinFileRepository repository;
+    private BinFileService binFileService;
 
     @BeforeEach
     void setUp() {
@@ -47,9 +47,8 @@ class BinDiffServiceImplTest {
         side = Side.RIGHT;
         FileId rightFileId = new FileId(id, side);
         BinFile rightFile = new BinFile(rightFileId, data);
-        when(repository.findById(any(FileId.class))).
-                thenReturn(java.util.Optional.of(leftFile)).
-                thenReturn(java.util.Optional.of(rightFile));
+        when(binFileService.getBinFile(id, Side.LEFT)).thenReturn(leftFile);
+        when(binFileService.getBinFile(id, Side.RIGHT)).thenReturn(rightFile);
 
         // When
         Diff diff = service.getDiff(id);
@@ -72,9 +71,8 @@ class BinDiffServiceImplTest {
         FileId rightFileId = new FileId(id, side);
         String rightData = Base64.getEncoder().encodeToString("abcd".getBytes(StandardCharsets.UTF_8.toString()));
         BinFile rightFile = new BinFile(rightFileId, rightData);
-        when(repository.findById(any(FileId.class))).
-                thenReturn(java.util.Optional.of(leftFile)).
-                thenReturn(java.util.Optional.of(rightFile));
+        when(binFileService.getBinFile(id, Side.LEFT)).thenReturn(leftFile);
+        when(binFileService.getBinFile(id, Side.RIGHT)).thenReturn(rightFile);
 
         // When
         Diff diff = service.getDiff(id);
@@ -97,9 +95,8 @@ class BinDiffServiceImplTest {
         FileId rightFileId = new FileId(id, side);
         String rightData = Base64.getEncoder().encodeToString("cba".getBytes(StandardCharsets.UTF_8.toString()));
         BinFile rightFile = new BinFile(rightFileId, rightData);
-        when(repository.findById(any(FileId.class))).
-                thenReturn(java.util.Optional.of(leftFile)).
-                thenReturn(java.util.Optional.of(rightFile));
+        when(binFileService.getBinFile(id, Side.LEFT)).thenReturn(leftFile);
+        when(binFileService.getBinFile(id, Side.RIGHT)).thenReturn(rightFile);
 
         // When
         Diff diff = service.getDiff(id);
@@ -107,18 +104,35 @@ class BinDiffServiceImplTest {
         // Then
         assertFalse(diff.isEqual());
         assertNotNull(diff.getOffsetDiff());
-        assertEquals(3, diff.getOffsetDiff().size());
+        assertEquals(2, diff.getOffsetDiff().size());
     }
 
     @Test
     void getDiffFileNotFound() {
         // Given
         long id = 1l;
-        when(repository.findById(any(FileId.class))).thenReturn(java.util.Optional.empty());
+        when(binFileService.getBinFile(id, Side.LEFT)).thenThrow(BinFileNotFoundException.class);
 
         // When
         // Then
-        assertThrows(BinFileNotFoundException.class, () -> {
+        assertThrows(DiffFileNotFoundException.class, () -> {
+            service.getDiff(id);
+        });
+    }
+
+    @Test
+    void getDiffFileInvalidData() {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        String invalidData = "abc;123";
+        FileId fileId = new FileId(id, side);
+        BinFile file = new BinFile(fileId, invalidData);
+        when(binFileService.getBinFile(id, Side.LEFT)).thenReturn(file);
+
+        // When
+        // Then
+        assertThrows(BinDataConverterException.class, () -> {
             service.getDiff(id);
         });
     }
