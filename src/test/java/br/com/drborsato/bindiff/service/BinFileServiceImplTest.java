@@ -1,5 +1,8 @@
 package br.com.drborsato.bindiff.service;
 
+import br.com.drborsato.bindiff.exception.BinDataConverterException;
+import br.com.drborsato.bindiff.exception.BinFileConflictException;
+import br.com.drborsato.bindiff.exception.BinFileNotFoundException;
 import br.com.drborsato.bindiff.model.BinFile;
 import br.com.drborsato.bindiff.model.FileId;
 import br.com.drborsato.bindiff.model.Side;
@@ -12,15 +15,17 @@ import org.mockito.MockitoAnnotations;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class BinFileServiceImplTest {
 
     @InjectMocks
     private BinFileServiceImpl service;
+
     @Mock
     private BinFileRepository repository;
 
@@ -37,57 +42,152 @@ class BinFileServiceImplTest {
         FileId fileId = new FileId(id, side);
         String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
         BinFile expectedFile = new BinFile(fileId, data);
-        when(repository.findById(fileId)).thenReturn(java.util.Optional.of(expectedFile));
+        when(repository.findById(any(FileId.class))).thenReturn(java.util.Optional.of(expectedFile));
 
         // When
-        Optional<BinFile> actualFile = service.getBinFile(id, side);
+        BinFile actualFile = service.getBinFile(id, side);
 
         // Then
         assertEquals(actualFile, expectedFile);
     }
 
     @Test
-    void getBinFileNotFound() throws Exception {
-    }
+    void getBinFileNotFound() {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        when(repository.findById(any(FileId.class))).thenReturn(java.util.Optional.empty());
 
-    @Test
-    void getBinFileException() throws Exception {
+        // When
+        // Then
+        assertThrows(BinFileNotFoundException.class, () -> {
+            service.getBinFile(id, side);
+        });
     }
 
     @Test
     void createBinFile() throws Exception {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        FileId fileId = new FileId(id, side);
+        String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
+        BinFile expectedFile = new BinFile(fileId, data);
+        when(repository.existsById(any(FileId.class))).thenReturn(false);
+        when(repository.save(any(BinFile.class))).thenReturn(expectedFile);
+
+        // When
+        BinFile actualFile = service.createBinFile(id, side, data);
+
+        // Then
+        assertEquals(actualFile, expectedFile);
     }
 
     @Test
     void createBinFileAlreadyExist() throws Exception {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
+        when(repository.existsById(any(FileId.class))).thenReturn(true);
+
+        // When
+        // Then
+        assertThrows(BinFileConflictException.class, () -> {
+            service.createBinFile(id, side, data);
+        });
     }
 
     @Test
-    void createBinFileException() throws Exception {
+    void createBinFileInvalidData() {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        String invalidData = "abc;123";
+        when(repository.existsById(any(FileId.class))).thenReturn(true);
+
+        // When
+        // Then
+        assertThrows(BinDataConverterException.class, () -> {
+            service.createBinFile(id, side, invalidData);
+        });
     }
 
     @Test
     void updateBinFile() throws Exception {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        FileId fileId = new FileId(id, side);
+        String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
+        BinFile expectedFile = new BinFile(fileId, data);
+        when(repository.existsById(any(FileId.class))).thenReturn(true);
+        when(repository.save(any(BinFile.class))).thenReturn(expectedFile);
+
+        // When
+        BinFile actualFile = service.updateBinFile(id, side, data);
+
+        // Then
+        assertEquals(actualFile, expectedFile);
     }
 
     @Test
     void updateBinFileNotFound() throws Exception {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
+        when(repository.existsById(any(FileId.class))).thenReturn(false);
+
+        // When
+        // Then
+        assertThrows(BinFileNotFoundException.class, () -> {
+            service.updateBinFile(id, side, data);
+        });
     }
 
     @Test
-    void updateBinFileException() throws Exception {
+    void updateBinFileInvalidData() {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        String data = "abc;123";
+        when(repository.existsById(any(FileId.class))).thenReturn(false);
+
+        // When
+        // Then
+        assertThrows(BinDataConverterException.class, () -> {
+            service.updateBinFile(id, side, data);
+        });
     }
 
     @Test
     void deleteBinFile() throws Exception {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        FileId fileId = new FileId(id, side);
+        String data = Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString()));
+        BinFile expectedFile = new BinFile(fileId, data);
+        when(repository.existsById(any(FileId.class))).thenReturn(true);
+
+        // When
+        service.deleteBinFile(id, side);
+        // Then no exception
     }
 
     @Test
-    void deleteBinFileNotFound() throws Exception {
-    }
+    void deleteBinFileNotFound() {
+        // Given
+        long id = 1l;
+        Side side = Side.LEFT;
+        when(repository.existsById(any(FileId.class))).thenReturn(false);
 
-    @Test
-    void deleteBinFileException() throws Exception {
+        // When
+        // Then
+        assertThrows(BinFileNotFoundException.class, () -> {
+            service.deleteBinFile(id, side);
+        });
     }
 
 }

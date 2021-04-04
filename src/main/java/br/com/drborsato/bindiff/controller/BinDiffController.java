@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 public class BinDiffController implements BinDiffOperations {
 
@@ -24,31 +22,27 @@ public class BinDiffController implements BinDiffOperations {
     }
 
     @Override
-    public Optional<BinFile> getBinFile(long id, String side) throws Exception {
-        Side s = Side.valueOf(side.toUpperCase());
-        return fileService.getBinFile(id, s);
+    public BinFile getBinFile(long id, Side side) {
+        return fileService.getBinFile(id, side);
     }
 
     @Override
-    public BinFile createBinFile(long id, String side, String data) throws Exception {
-        Side s = Side.valueOf(side.toUpperCase());
-        return fileService.createBinFile(id, s, data);
+    public BinFile createBinFile(long id, Side side, String data) {
+        return fileService.createBinFile(id, side, data);
     }
 
     @Override
-    public BinFile updateBinFile(long id, String side, String data) throws Exception {
-        Side s = Side.valueOf(side.toUpperCase());
-        return fileService.updateBinFile(id, s, data);
+    public BinFile updateBinFile(long id, Side side, String data) {
+        return fileService.updateBinFile(id, side, data);
     }
 
     @Override
-    public void deleteBinFile(long id, String side) throws Exception {
-        Side s = Side.valueOf(side.toUpperCase());
-        fileService.deleteBinFile(id, s);
+    public void deleteBinFile(long id, Side side) {
+        fileService.deleteBinFile(id, side);
     }
 
     @Override
-    public Diff getDiff(@PathVariable long id) throws Exception {
+    public Diff getDiff(@PathVariable long id) {
         return diffService.getDiff(id);
     }
 }
