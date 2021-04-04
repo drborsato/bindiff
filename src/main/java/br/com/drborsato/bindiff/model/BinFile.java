@@ -11,6 +11,9 @@ public class BinFile {
 
     private String data;
 
+    public BinFile() {
+    }
+
     public BinFile(FileId fileId, String data) {
         this.fileId = fileId;
         this.data = data;
