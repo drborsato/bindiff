@@ -6,6 +6,9 @@ public class Diff {
     private boolean isEqual;
     private List<Offset> offsetDiff;
 
+    public Diff() {
+    }
+
     public Diff(boolean isEqual, List<Offset> offsetDiff) {
         this.isEqual = isEqual;
         this.offsetDiff = offsetDiff;

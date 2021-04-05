@@ -6,6 +6,9 @@ public class Offset {
     private byte left;
     private byte right;
 
+    public Offset() {
+    }
+
     public Offset(int position, byte left, byte right) {
         this.position = position;
         this.left = left;

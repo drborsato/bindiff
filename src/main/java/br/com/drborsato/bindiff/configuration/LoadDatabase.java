@@ -25,6 +25,18 @@ public class LoadDatabase {
                     Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString())))));
             log.info("Preloading " + repository.save(new BinFile(new FileId(1l, Side.RIGHT),
                     Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(2l, Side.LEFT),
+                    Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(2l, Side.RIGHT),
+                    Base64.getEncoder().encodeToString("abcd".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(3l, Side.LEFT),
+                    Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(3l, Side.RIGHT),
+                    Base64.getEncoder().encodeToString("cba".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(4l, Side.LEFT),
+                    Base64.getEncoder().encodeToString("abc".getBytes(StandardCharsets.UTF_8.toString())))));
+            log.info("Preloading " + repository.save(new BinFile(new FileId(4l, Side.RIGHT),
+                    Base64.getEncoder().encodeToString("cba".getBytes(StandardCharsets.UTF_8.toString())))));
         };
     }
 }
